@@ -1,0 +1,6 @@
+@EncryptionPractice_HostAddress = http://localhost:5043
+
+GET {{EncryptionPractice_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
