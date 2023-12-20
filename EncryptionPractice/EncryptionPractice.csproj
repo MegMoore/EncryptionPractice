@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <Compile Remove="Models\Encryption.cs" />
+    <Compile Remove="Models\erson.cs" />
   </ItemGroup>
 
   <ItemGroup>

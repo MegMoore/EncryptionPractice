@@ -4,6 +4,8 @@ using EncryptionPractice.Data;
 using System.Security.Cryptography;
 using EncryptionPractice.Controllers;
 using static EncryptionPractice.Controllers.KidsController;
+using System.Text;
+using EncryptionPractice.Models;
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<EncryptionPracticeContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DevDb") ?? throw new InvalidOperationException("Connection string 'EncryptionPracticeContext' not found.")));
@@ -16,81 +18,39 @@ builder.Services.AddControllers();
 
 var app = builder.Build();
 
-//Encryption
-static byte[] Encrypt(string simpletext, byte[] key, byte[] iv)
-{
-    byte[] cipheredtext;
-    using (Aes aes = Aes.Create())
+
+    static void Main()
     {
-        ICryptoTransform encryptor = aes.CreateEncryptor(key, iv);
-        using (MemoryStream memoryStream = new MemoryStream())
+        // Initialize a secure encryption key (in a real scenario, this should be handled securely)
+        byte[] encryptionKey = Encoding.UTF8.GetBytes("ThisIsASecretKey123");
+
+        // Create an instance of the DatabaseService
+        DataService dataService = new DataService(encryptionKey);
+
+        // Example: Save encrypted person to the database
+        Person personToSave = new Person
         {
-            using (CryptoStream cryptoStream = new CryptoStream(memoryStream, encryptor, CryptoStreamMode.Write))
-            {
-                using (StreamWriter streamWriter = new StreamWriter(cryptoStream))
-                {
-                    streamWriter.Write(simpletext);
-                }
+            FirstName = "Alice",
+            LastName = "Smith",
+            EmailAddress = "alice.smith@example.com"
+        };
+        dataService.SaveEncryptedPerson(personToSave);
 
-                cipheredtext = memoryStream.ToArray();
-            }
-        }
-    }
-    return cipheredtext;
-}
-//Decription
-static string Decrypt(byte[] cipheredtext, byte[] key, byte[] iv)
-{
-    string simpletext = String.Empty;
-    using (Aes aes = Aes.Create())
-    {
-        ICryptoTransform decryptor = aes.CreateDecryptor(key, iv);
-        using (MemoryStream memoryStream = new MemoryStream(cipheredtext))
+        // Example: Retrieve and decrypt person from the database
+        Person retrievedPerson = dataService.RetrieveDecryptedPerson(personToSave);
+        if (retrievedPerson != null)
         {
-            using (CryptoStream cryptoStream = new CryptoStream(memoryStream, decryptor, CryptoStreamMode.Read))
-            {
-                using (StreamReader streamReader = new StreamReader(cryptoStream))
-                {
-                    simpletext = streamReader.ReadToEnd();
-                }
-            }
+            Console.WriteLine($"Retrieved person: {retrievedPerson.FirstName} {retrievedPerson.LastName} ({retrievedPerson.EmailAddress})");
         }
-    }
-    return simpletext;
-}
-//Main Method
-static void Main(string[] args)
-{
-    Console.WriteLine("Please enter a username:");
-    string username = Console.ReadLine();
-
-    Console.WriteLine("Please enter a password:");
-    string HashPassword = Console.ReadLine();
-
-    //Generate the key and IV
-    byte[] key = new byte[16];
-
-    byte[] iv = new byte[16];
-
-    using (RandomNumberGenerator rng = RandomNumberGenerator.Create())
-    {
-        rng.GetBytes(key);
-        rng.GetBytes(iv);
-    }
-
-    //Encrypt the password
-    byte[] encryptedPassword = Encrypt(HashPassword, key, iv);
-    string encryptedPasswordString = Convert.ToBase64String(encryptedPassword);
-    Console.WriteLine("Encrypted password: " + encryptedPasswordString);
-
-    //Decrypt the password
-    string decryptedPassword = Decrypt(encryptedPassword, key, iv);
-    Console.WriteLine("Decrypted password: " + decryptedPassword);
-    Console.ReadLine();
-}
+        else
+        {
+            Console.WriteLine("No person retrieved from the database.");
+        }
+        Console.WriteLine($"Retrieved person: {retrievedPerson?.FirstName} {retrievedPerson?.LastName} ({retrievedPerson?.EmailAddress})");
+        }
 
 
-// Configure the HTTP request pipeline.
+//Configure the HTTP request pipeline.
 
 app.UseHttpsRedirection();
 
