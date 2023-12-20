@@ -15,5 +15,6 @@ namespace EncryptionPractice.Data
         }
 
         public DbSet<EncryptionPractice.Models.Kid> Kids { get; set; } = default!;
+        public DbSet<EncryptionPractice.Models.Person> Persons { get; set; } = default!;
     }
 }

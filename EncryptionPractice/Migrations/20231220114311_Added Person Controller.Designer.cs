@@ -3,6 +3,7 @@ using EncryptionPractice.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EncryptionPractice.Migrations
 {
     [DbContext(typeof(EncryptionPracticeContext))]
-    partial class EncryptionPracticeContextModelSnapshot : ModelSnapshot
+    [Migration("20231220114311_Added Person Controller")]
+    partial class AddedPersonController
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
