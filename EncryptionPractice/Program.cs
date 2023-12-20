@@ -18,38 +18,6 @@ builder.Services.AddControllers();
 
 var app = builder.Build();
 
-
-    static void Main()
-    {
-        // Initialize a secure encryption key (in a real scenario, this should be handled securely)
-        byte[] encryptionKey = Encoding.UTF8.GetBytes("ThisIsASecretKey123");
-
-        // Create an instance of the DatabaseService
-        DataService dataService = new DataService(encryptionKey);
-
-        // Example: Save encrypted person to the database
-        Person personToSave = new Person
-        {
-            FirstName = "Alice",
-            LastName = "Smith",
-            EmailAddress = "alice.smith@example.com"
-        };
-        dataService.SaveEncryptedPerson(personToSave);
-
-        // Example: Retrieve and decrypt person from the database
-        Person retrievedPerson = dataService.RetrieveDecryptedPerson(personToSave);
-        if (retrievedPerson != null)
-        {
-            Console.WriteLine($"Retrieved person: {retrievedPerson.FirstName} {retrievedPerson.LastName} ({retrievedPerson.EmailAddress})");
-        }
-        else
-        {
-            Console.WriteLine("No person retrieved from the database.");
-        }
-        Console.WriteLine($"Retrieved person: {retrievedPerson?.FirstName} {retrievedPerson?.LastName} ({retrievedPerson?.EmailAddress})");
-        }
-
-
 //Configure the HTTP request pipeline.
 
 app.UseHttpsRedirection();
