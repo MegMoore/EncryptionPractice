@@ -8,7 +8,10 @@ using System.Text;
 using EncryptionPractice.Models;
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<EncryptionPracticeContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DevDb") ?? throw new InvalidOperationException("Connection string 'EncryptionPracticeContext' not found.")));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DevDb"))
+
+            .EnableSensitiveDataLogging()
+           .LogTo(Console.WriteLine, LogLevel.Information));
 
 
 

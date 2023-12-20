@@ -18,13 +18,15 @@ namespace EncryptionPractice.Controllers
 
     public class PeopleController : ControllerBase
     {
-        private readonly byte[] encryptionKey; // Initialize this key securely
-        private readonly List<Person> database = new List<Person>(); // Simulated database
+        private readonly EncryptionPracticeContext _dbContext;
+        private readonly byte[] encryptionKey;
 
-        public PeopleController()
+        public PeopleController(EncryptionPracticeContext dbContext)
         {
+            _dbContext = dbContext;
+
             // Initialize the encryption key securely (this is just an example, use a secure method for production)
-            encryptionKey = Encoding.UTF8.GetBytes("ThisIsASecretKey123");
+            encryptionKey = Encoding.UTF8.GetBytes("ThisIsASecretKey1234567890123456");
         }
 
         [HttpGet("getall")]
@@ -32,8 +34,11 @@ namespace EncryptionPractice.Controllers
         {
             try
             {
-                // Decrypt all persons before returning them
-                List<Person> decryptedPersons = database.Select(DecryptPerson).ToList();
+                // Retrieve all persons from the database
+                List<Person> persons = _dbContext.Persons.ToList();
+
+                // Decrypt email addresses before returning them
+                List<Person> decryptedPersons = persons.Select(DecryptPerson).ToList();
                 return Ok(decryptedPersons);
             }
             catch (Exception ex)
@@ -48,7 +53,7 @@ namespace EncryptionPractice.Controllers
             try
             {
                 // Retrieve the person from the database
-                Person person = database.FirstOrDefault(p => p.Id == id);
+                Person person = _dbContext.Persons.FirstOrDefault(p => p.Id == id);
 
                 if (person == null)
                 {
@@ -72,7 +77,8 @@ namespace EncryptionPractice.Controllers
             {
                 // Encrypt the person's data before storing it in the database
                 Person encryptedPerson = EncryptPerson(person);
-                database.Add(encryptedPerson);
+                _dbContext.Persons.Add(encryptedPerson);
+                _dbContext.SaveChanges();
 
                 return CreatedAtAction(nameof(GetPersonById), new { id = encryptedPerson.Id }, encryptedPerson);
             }
@@ -88,7 +94,7 @@ namespace EncryptionPractice.Controllers
             try
             {
                 // Find the person in the database
-                Person existingPerson = database.FirstOrDefault(p => p.Id == id);
+                Person existingPerson = _dbContext.Persons.FirstOrDefault(p => p.Id == id);
 
                 if (existingPerson == null)
                 {
@@ -105,6 +111,9 @@ namespace EncryptionPractice.Controllers
                 // Convert the encrypted byte array to a string
                 existingPerson.EmailAddress = Convert.ToBase64String(encryptedEmail);
 
+                // Save changes to the database
+                _dbContext.SaveChanges();
+
                 return Ok(existingPerson);
             }
             catch (Exception ex)
@@ -119,14 +128,16 @@ namespace EncryptionPractice.Controllers
             try
             {
                 // Find and remove the person from the database
-                Person personToRemove = database.FirstOrDefault(p => p.Id == id);
+                Person personToRemove = _dbContext.Persons.FirstOrDefault(p => p.Id == id);
 
                 if (personToRemove == null)
                 {
                     return NotFound("Person not found");
                 }
 
-                database.Remove(personToRemove);
+                _dbContext.Persons.Remove(personToRemove);
+                _dbContext.SaveChanges();
+
                 return NoContent();
             }
             catch (Exception ex)
@@ -134,6 +145,7 @@ namespace EncryptionPractice.Controllers
                 return BadRequest($"Error deleting person: {ex.Message}");
             }
         }
+
 
         // Encryption logic
         private Person EncryptPerson(Person person)
