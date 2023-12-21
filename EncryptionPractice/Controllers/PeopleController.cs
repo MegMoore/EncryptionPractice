@@ -10,12 +10,11 @@ using EncryptionPractice.Models;
 using System.Text;
 using System.Security.Cryptography;
 
+
 namespace EncryptionPractice.Controllers
 {
-
     [Route("api/[controller]")]
     [ApiController]
-
     public class PeopleController : ControllerBase
     {
         private readonly EncryptionPracticeContext _dbContext;
@@ -146,7 +145,6 @@ namespace EncryptionPractice.Controllers
             }
         }
 
-
         // Encryption logic
         private Person EncryptPerson(Person person)
         {
@@ -221,3 +219,5 @@ namespace EncryptionPractice.Controllers
         }
     }
 }
+
+
