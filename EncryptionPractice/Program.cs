@@ -6,6 +6,9 @@ using EncryptionPractice.Controllers;
 using static EncryptionPractice.Controllers.KidsController;
 using System.Text;
 using EncryptionPractice.Models;
+using Microsoft.Extensions.Configuration;
+
+
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<EncryptionPracticeContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DevDb"))
@@ -13,15 +16,9 @@ builder.Services.AddDbContext<EncryptionPracticeContext>(options =>
             .EnableSensitiveDataLogging()
            .LogTo(Console.WriteLine, LogLevel.Information));
 
-
-
-// Add services to the container.
-
 builder.Services.AddControllers();
 
 var app = builder.Build();
-
-//Configure the HTTP request pipeline.
 
 app.UseHttpsRedirection();
 
@@ -30,3 +27,4 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
